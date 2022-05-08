@@ -65,10 +65,6 @@ async def help(ctx):
         embed = embed
     )
 
-"""
-!auctioninfo: Gives info on current auction\n!bid: Places your bid on an auctioned item\n!bidhist <user>: Shows history of a user`s bids\n!bidremove: Removes your bid from an auctioned item\n!create <item> <duration> <starting bid>: Creates an auction\n!help: Shows commands\n!leaderboard: Shows bidding leaderboard for the current auction\n!remove: removes an auction
-"""
-
 @bot.command()
 async def info(ctx):
 
@@ -113,50 +109,6 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
 
 
 
-"""
-relative time stamps
-"""
-    
-"""
-client = discord.Client()
-
-@client.event
-async def on_ready():
-    print('Auction bot is now online!')
-
-client.run('OTQ0Njc3OTc5MTg1ODcyOTg4.YhFF7Q.s3z0MC6V8Czo7l4PCw0jP-X_gGk')
-"""
-class AuctionBot(discord.Client):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.target_message_id = 953104372332658688
-
-    async def on_ready(self):
-        print('Auction bot is now online! - sharp')
-
-    async def on_raw_reaction_add(self, payload):
-        if payload.message_id != self.target_message_id:
-                return
-
-        guild = Client.get_guild(payload.guild_id)
-
-        if payload.emoji.name == '🦈':
-            role = discord.utils.get(guild.roles, name='Auction Shark')
-            await payload.member.add_roles(role)
-
-    async def on_raw_reaction_remove(self, payload):
-        if payload.message_id != self.target_message_id:
-                return
-
-        guild = Client.get_guild(payload.guild_id)
-        member = guild.get_member(payload.user_id)
-
-        if payload.emoji.name == '🦈':
-            role = discord.utils.get(guild.roles, name='Auction Shark')
-            await member.remove_roles(role)
-
-
 
 intents = discord.Intents.default()
 intents.members = True
@@ -165,13 +117,6 @@ Client = AuctionBot(intents=intents)
 
 
 
-bot.run('OTQ0Njc3OTc5MTg1ODcyOTg4.YhFF7Q.s3z0MC6V8Czo7l4PCw0jP-X_gGk')
+bot.run('Insert Token Here')
 
-Client.run('OTQ0Njc3OTc5MTg1ODcyOTg4.YhFF7Q.s3z0MC6V8Czo7l4PCw0jP-X_gGk')
-
-
-# https://www.youtube.com/watch?v=XL6ABuJ0XO0&list=PL6gx4Cwl9DGAHdJdtEl0-XiRfPRAvpbSz&index=3
-
-    
-
-
+Client.run('Insert Token Here')
