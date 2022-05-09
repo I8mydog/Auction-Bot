@@ -73,12 +73,12 @@ async def info(ctx):
     await ctx.send(ctx.message.id)
 
 CreationTime = '<t:{int(time.time())}:f>'
-
+print(3)
 @bot.command()
 async def create(ctx, ItemName, AuctionDuration, StartingBid):
     
     EndingTime = CreationTime + (AuctionDuration * 86400)
-
+    print(EndingTime)
     embedvar = discord.Embed(
         title=f'Auction Created for {ItemName}',
     )
@@ -106,6 +106,12 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
     await ctx.send(
         embed=embedvar
     )
+
+
+class AuctionBot(discord.Client):
+
+    async def on_ready(self):
+        print('Auction bot is now online!')
 
 
 
