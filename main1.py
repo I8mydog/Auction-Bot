@@ -11,58 +11,62 @@ import asyncio
 from discord.ext import commands
 from setuptools import Command
 
+""" Some of these libraries were automatically imported when I was going through trial and error. """
 
 bot = commands.Bot(command_prefix='!')
 bot.remove_command('help')
 
 @bot.command()
 async def help(ctx):
-    embed = discord.Embed(
-        title='Bot Commands',
-        description='List of all the commands for the auction bot. Some commands will only be accessible by mods.'
-    )
-    embed.add_field(
-        name='!auctioninfo',
-        value='Gives info on the current auction',
-        inline=False
-    )
-    embed.add_field(
-        name='!bid',
-        value='Places your bid on an auctioned item',
-        inline=False
-    )
-    embed.add_field(
-        name='!bidhist <user>',
-        value='Shows history of a user`s bids',
-        inline=False
-    )
-    embed.add_field(
-        name='!biddel',
-        value='Deletes your bid from an auctioned item',
-        inline=False
-    )
-    embed.add_field(
-        name='!create <item> <duration> <starting bid>',
-        value='Creates an auction',
-        inline=False
-    )
-    embed.add_field(
-        name='!help',
-        value='Shows the list of all commands',
-        inline=False
-    )
-    embed.add_field(
-        name='!leaderboard',
-        value='Shows the bidding leaderboard for the current auction',
-        inline=False
-    )
-    embed.add_field(
-        name='!remove',
-        value='Removes an auction',
-        inline=False
-    )
+    embed_data = {
+        "title": "Bot Commands",
+        "description": "List of all the commands for the auction bot. Some commands will only be accessible by mods.",
+        "fields": [
+            {
+                "name": '!auctioninfo',
+                "value": 'Gives info on the current auction',
+                "inline": False
+            },
+            {
+                "name": '!bid',
+                "value": 'Places your bid on an auctioned item',
+                "inline": False
+            },
+            {
+                "name": '!bidhist <user>',
+                "value": 'Shows history of a user`s bids',
+                "inline": False
+            },
+            {
+                "name": '!biddel',
+                "value": 'Deletes your bid from an auctioned item',
+                "inline": False
+            },
+            {
+                "name": '!create <item> <duration> <starting bid>',
+                "value": 'Creates an auction',
+                "inline": False                
+            },
+            {
+                "name": '!help',
+                "value": 'Shows the list of all commands',
+                "inline": False                
+            },
+            {
+                "name": '!leaderboard',
+                "value": 'Shows the bidding leaderboard for the current auction',
+                "inline": False                
+            },
+            {
+                "name": '!remove',
+                "value": 'Removes an auction',
+                "inline": False                
+            }
+        ]
+    }
+
     await ctx.send(
-        embed = embed
+        embed = discord.Embed.from_dict(embed_data)
     )
 
 @bot.command()
@@ -72,12 +76,14 @@ async def info(ctx):
     await ctx.send(ctx.author)
     await ctx.send(ctx.message.id)
 
-CreationTime = '<t:{int(time.time())}:f>'
+
 print(3)
 @bot.command()
 async def create(ctx, ItemName, AuctionDuration, StartingBid):
-    
-    EndingTime = CreationTime + (AuctionDuration * 86400)
+    global CreationTime, EndingTime
+    CreationTime = f'<t:{int(time.time())}:f>'
+    EndingTime = f'<t:{int(time.time()) + int(AuctionDuration) * 86400}:f>'
+    print(CreationTime)
     print(EndingTime)
     embedvar = discord.Embed(
         title=f'Auction Created for {ItemName}',
@@ -95,17 +101,17 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
     embedvar.add_field(
         name='Auction Creation Time',
         value=CreationTime,
-        inline=True
+        inline=False
     )
     embedvar.add_field(
-        name='Auction End Time',
+        name='Auction Ending Time',
         value=EndingTime,
         inline=True
     )
-
     await ctx.send(
         embed=embedvar
     )
+
 
 
 class AuctionBot(discord.Client):
@@ -126,3 +132,7 @@ Client = AuctionBot(intents=intents)
 bot.run('Insert Token Here')
 
 Client.run('Insert Token Here')
+
+   
+
+
