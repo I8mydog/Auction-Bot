@@ -1,17 +1,17 @@
 from calendar import day_abbr, month
 from datetime import datetime
 from datetime import timedelta
-from email import message
-from mailbox import Message
+import json
 import os
 import time
 from tkinter import COMMAND
+from typing import ItemsView
+from unicodedata import name
 import discord
 import asyncio
 from discord.ext import commands
 from setuptools import Command
 
-""" Some of these libraries were automatically imported when I was going through trial and error. """
 
 bot = commands.Bot(command_prefix='!')
 bot.remove_command('help')
@@ -76,18 +76,45 @@ async def info(ctx):
     await ctx.send(ctx.author)
     await ctx.send(ctx.message.id)
 
-
-print(3)
 @bot.command()
 async def create(ctx, ItemName, AuctionDuration, StartingBid):
-    global CreationTime, EndingTime
+    global CreationTime, EndingTime, ItemNameGlobal, StartingBidGlobal
     CreationTime = f'<t:{int(time.time())}:f>'
     EndingTime = f'<t:{int(time.time()) + int(AuctionDuration) * 86400}:f>'
+    ItemNameGlobal = ItemName
+    StartingBidGlobal = StartingBid
     print(CreationTime)
     print(EndingTime)
-    embedvar = discord.Embed(
-        title=f'Auction Created for {ItemName}',
+    embeddata1, = {
+        "title": f"Auction Created for {ItemName}",
+        "fields": [
+            {
+                "name": 'Starting Bid',
+                "value": f'{StartingBid} nuggets',
+                "inline": True
+            },
+            {
+                "name": 'Duration',
+                "value": f'{AuctionDuration} nuggets',
+                "inline": True
+            },
+            {
+                "name": 'Auction Creation Time',
+                "value": CreationTime,
+                "inline": True
+            },
+            {
+                "name": 'Auction Ending Time',
+                "value": EndingTime,
+                "inline": True
+            }
+        ]
+    }
+
+    await ctx.send(
+        embed = discord.Embed.from_dict(embeddata1)
     )
+    """
     embedvar.add_field(
         name='Starting Bid',
         value=f'{StartingBid} nuggets',
@@ -111,8 +138,34 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
     await ctx.send(
         embed=embedvar
     )
+    """
+@bot.command
+async def auctioninfo(ctx):
+    embed1 = discord.Embed(
+        title='Current Auction'
+    )
+    embed1.add_field(
+        name='Item Name',
+        value=f'{ItemNameGlobal}',
+        inline=True
+    )
+    embed1.add_field(
+        name='Starting Bid',
+        value=f'{StartingBidGlobal}',
+        inline=True
+    )
+    embed1.add_field(
+        name='Current Bid',
+        value='Placeholder',
+        inline=True
+    )
+    embed1.add_field(
+        name='Time Remaining',
+        value=f'{str(int(int(EndingTime)-int(time.time()))/86400)} days',
+        inline=True
+    )
 
-
+print(ItemNameGlobal)
 
 class AuctionBot(discord.Client):
 
@@ -132,7 +185,4 @@ Client = AuctionBot(intents=intents)
 bot.run('Insert Token Here')
 
 Client.run('Insert Token Here')
-
-   
-
 
