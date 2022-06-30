@@ -14,14 +14,19 @@ from setuptools import Command
 
 
 bot = commands.Bot(command_prefix='!')
-bot.remove_command('help')
 
 @bot.command()
-async def help(ctx):
+async def abt(ctx):
+    print(abt)
     embed_data = {
         "title": "Bot Commands",
         "description": "List of all the commands for the auction bot. Some commands will only be accessible by mods.",
         "fields": [
+            {
+                "name": '!abt',
+                "value": 'Shows the list of all commands',
+                "inline": False                
+            },
             {
                 "name": '!auctioninfo',
                 "value": 'Gives info on the current auction',
@@ -48,11 +53,6 @@ async def help(ctx):
                 "inline": False                
             },
             {
-                "name": '!help',
-                "value": 'Shows the list of all commands',
-                "inline": False                
-            },
-            {
                 "name": '!leaderboard',
                 "value": 'Shows the bidding leaderboard for the current auction',
                 "inline": False                
@@ -68,7 +68,7 @@ async def help(ctx):
     await ctx.send(
         embed = discord.Embed.from_dict(embed_data)
     )
-
+    
 @bot.command()
 async def info(ctx):
 
@@ -76,16 +76,23 @@ async def info(ctx):
     await ctx.send(ctx.author)
     await ctx.send(ctx.message.id)
 
+
+
+
+global CreationTime, EndingTime, ItemNameGlobal, StartingBidGlobal
+
+
+
 @bot.command()
 async def create(ctx, ItemName, AuctionDuration, StartingBid):
     global CreationTime, EndingTime, ItemNameGlobal, StartingBidGlobal
-    CreationTime = f'<t:{int(time.time())}:f>'
-    EndingTime = f'<t:{int(time.time()) + int(AuctionDuration) * 86400}:f>'
+    CreationTime = int(time.time())
+    EndingTime = int(time.time()) + int(AuctionDuration) * 86400
     ItemNameGlobal = ItemName
     StartingBidGlobal = StartingBid
     print(CreationTime)
     print(EndingTime)
-    embeddata1, = {
+    embeddata1 = {
         "title": f"Auction Created for {ItemName}",
         "fields": [
             {
@@ -95,17 +102,17 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
             },
             {
                 "name": 'Duration',
-                "value": f'{AuctionDuration} nuggets',
+                "value": f'{AuctionDuration} days',
                 "inline": True
             },
             {
                 "name": 'Auction Creation Time',
-                "value": CreationTime,
+                "value": f'<t:{CreationTime}:f>',
                 "inline": True
             },
             {
                 "name": 'Auction Ending Time',
-                "value": EndingTime,
+                "value": f'<t:{EndingTime}:f>',
                 "inline": True
             }
         ]
@@ -139,8 +146,14 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
         embed=embedvar
     )
     """
-@bot.command
+
+
+
+
+@bot.command()
+
 async def auctioninfo(ctx):
+    print(auctioninfo)
     embed1 = discord.Embed(
         title='Current Auction'
     )
@@ -161,16 +174,28 @@ async def auctioninfo(ctx):
     )
     embed1.add_field(
         name='Time Remaining',
-        value=f'{str(int(int(EndingTime)-int(time.time()))/86400)} days',
+        value=f'{str((EndingTime-int(time.time()))/86400)} days',
         inline=True
     )
+    await ctx.send(
+        embed = embed1
+    )
 
-print(ItemNameGlobal)
 
-class AuctionBot(discord.Client):
 
-    async def on_ready(self):
-        print('Auction bot is now online!')
+@bot.command()
+async def bid(ctx, BidAmount):
+    save_data = {}
+    save_data["bidlist"] = {}
+    
+    save_data["bidlist"][BidAmount] = ctx.author.id
+    with open("biddata1.json", "w") as f: 
+        json.dumps(save_data, f)
+        
+
+
+
+
 
 
 
@@ -178,11 +203,8 @@ class AuctionBot(discord.Client):
 intents = discord.Intents.default()
 intents.members = True
 
-Client = AuctionBot(intents=intents)
-
 
 
 bot.run('Insert Token Here')
 
-Client.run('Insert Token Here')
 
