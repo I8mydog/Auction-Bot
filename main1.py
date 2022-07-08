@@ -4,8 +4,8 @@ from datetime import timedelta
 import json
 import os
 import time
-from tkinter import COMMAND
-from typing import ItemsView
+import csv
+from turtle import end_fill
 from unicodedata import name
 import discord
 import asyncio
@@ -17,7 +17,6 @@ bot = commands.Bot(command_prefix='!')
 
 @bot.command()
 async def abt(ctx):
-    print(abt)
     embed_data = {
         "title": "Bot Commands",
         "description": "List of all the commands for the auction bot. Some commands will only be accessible by mods.",
@@ -121,6 +120,10 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
     await ctx.send(
         embed = discord.Embed.from_dict(embeddata1)
     )
+    bidtuple = (944677979185872988, StartingBid)
+    with open('biddata.csv', 'a', newline="\n") as csvfile:
+            bids = csv.writer(csvfile, delimiter=',')
+            bids.writerow(bidtuple)
     """
     embedvar.add_field(
         name='Starting Bid',
@@ -153,7 +156,6 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
 @bot.command()
 
 async def auctioninfo(ctx):
-    print(auctioninfo)
     embed1 = discord.Embed(
         title='Current Auction'
     )
@@ -164,7 +166,7 @@ async def auctioninfo(ctx):
     )
     embed1.add_field(
         name='Starting Bid',
-        value=f'{StartingBidGlobal}',
+        value=f'{StartingBidGlobal} nugs',
         inline=True
     )
     embed1.add_field(
@@ -174,7 +176,7 @@ async def auctioninfo(ctx):
     )
     embed1.add_field(
         name='Time Remaining',
-        value=f'{str((EndingTime-int(time.time()))/86400)} days',
+        value=f'<t:{EndingTime}:R>',
         inline=True
     )
     await ctx.send(
@@ -182,16 +184,36 @@ async def auctioninfo(ctx):
     )
 
 
-
 @bot.command()
-async def bid(ctx, BidAmount):
-    save_data = {}
-    save_data["bidlist"] = {}
-    
-    save_data["bidlist"][BidAmount] = ctx.author.id
-    with open("biddata1.json", "w") as f: 
-        json.dumps(save_data, f)
+async def bid(ctx, bidAmount):
+    global EndingTime, StartingBidGlobal
+    print(EndingTime)
+    """EndingTime = int(time.time()) + 10"""
+    if EndingTime < int(time.time()):
+        await ctx.send('There is currently no auction running. Please check with I8mydog or Boone for upcoming auctions.')
+        return
+    if EndingTime <= int(time.time()) + 15:
+        EndingTime = int(time.time()) + 30
+    if float(bidAmount) % 1 != 0:
+        await ctx.send("Invalid Bid")
+    bidtuple = (ctx.author.id, bidAmount)
+    lastbid = StartingBidGlobal
+    with open('biddata.csv', 'r', newline='\n') as csvfile:
+        bids = list(csv.reader(csvfile, delimiter=','))
+        if len(bids) != 0: 
+            lastbid = bids[-1][1]
         
+    if int(lastbid) + 5 <= int(bidAmount):
+        with open('biddata.csv', 'a', newline="\n") as csvfile:
+            bids = csv.writer(csvfile, delimiter=',')
+            bids.writerow(bidtuple)
+        await ctx.send(f'Bid successful! The current highest bid is {bidAmount}.')
+    else:
+        await ctx.send(f'Bid must be at least 5 nugs greater than {lastbid} nugs.')
+
+
+
+ 
 
 
 
