@@ -70,7 +70,7 @@ async def abt(ctx):
     
 
 global CreationTime, EndingTime, ItemNameGlobal, StartingBidGlobal
-EndingTime = 0
+EndingTime = 100000000000
 
 
 @bot.command()
