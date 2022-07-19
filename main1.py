@@ -9,7 +9,7 @@ from turtle import end_fill, title
 from unicodedata import name
 import discord
 import asyncio
-from discord.ext import commands
+from discord.ext import commands, tasks
 from setuptools import Command
 from random import randint
 import threading
@@ -70,14 +70,14 @@ async def abt(ctx):
     
 
 global CreationTime, EndingTime, ItemNameGlobal, StartingBidGlobal
-EndingTime = 100000000000
+EndingTime = 10000000000
 
 
 @bot.command()
 async def create(ctx, ItemName, AuctionDuration, StartingBid):
     global CreationTime, EndingTime, ItemNameGlobal, StartingBidGlobal
     CreationTime = int(time.time())
-    EndingTime = int(time.time()) + int(AuctionDuration)
+    EndingTime = int(time.time()) + int(AuctionDuration)#*86400
     ItemNameGlobal = ItemName
     StartingBidGlobal = StartingBid
     print(CreationTime)
@@ -115,6 +115,19 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
     with open('biddata.csv', 'a', newline="\n") as csvfile:
             bids = csv.writer(csvfile, delimiter=',')
             bids.writerow(bidtuple)
+    while time.time() < EndingTime:
+        time.sleep(1)
+        if EndingTime < time.time():
+            with open('biddata.csv', 'r', newline='\n') as csvfile:
+                bids = list(csv.reader(csvfile, delimiter=','))
+            endofauction = discord.Embed(
+                title= 'Auction Ended',    
+            )
+            endofauction.add_field(
+                name= 'The winner of the auction is',
+                value= f'<@{bids[-1][0]}> with {bids[-1][1]} nuggets!'
+            )
+            await ctx.send(embed = endofauction)
     """
     embedvar.add_field(
         name='Starting Bid',
@@ -255,14 +268,26 @@ async def bidhist(ctx, userid):
             name= bidhistfield,
             value= f'<@{userid}>'
         )
+        """for row in bids[::-1]:
+            if userid == row[0]:
+
+                bidhistembed.add_field(
+                name= f'{len(bidhistarray)+1}. {row[1]} nuggets',
+                value= '-------------------',
+                inline = False}
+                )
+                bidhistarray.append(row[1]) """
 
     await ctx.send(embed = bidhistembed)
-
+"""
 async def check(ctx, thread1):
     logging.info("Thread %s: starting", thread1)
+    time.sleep(int(0.5))
+    print("ggg ez")
     logging.info("Thread %s: finishing", thread1)
     while time.time() < EndingTime:
-        time.sleep(0.5)
+        time.sleep(int(0.5))
+        print("gg ez")
     if EndingTime < time.time():
         with open('biddata.csv', 'r', newline='\n') as csvfile:
             bids = list(csv.reader(csvfile, delimiter=','))
@@ -274,7 +299,7 @@ async def check(ctx, thread1):
             value= f'{bids[-1][0]} with {bids[-1][1]} nuggets!'
         )
     await ctx.send(embed = endofauction)
-
+"""
 
 
     
