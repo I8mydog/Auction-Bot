@@ -1,6 +1,5 @@
 from calendar import day_abbr, month
-from datetime import datetime
-from datetime import timedelta
+import datetime
 import shutil
 import os
 import time
@@ -57,7 +56,7 @@ async def abt(ctx):
                 "inline": False                
             },
             {
-                "name": '!lb',
+                "name": '!leaderboard',
                 "value": 'Shows the bidding leaderboard for the current auction',
                 "inline": False                
             }
@@ -115,21 +114,33 @@ async def create(ctx, ItemName, AuctionDuration, StartingBid):
     with open('biddata.csv', 'a', newline="\n") as csvfile:
             bids = csv.writer(csvfile, delimiter=',')
             bids.writerow(bidtuple)
-    if EndingTime < time.time():
-        with open('biddata.csv', 'r', newline='\n') as csvfile:
-            bids = list(csv.reader(csvfile, delimiter=','))
-        endofauction = discord.Embed(
-            title= 'Auction Ended'
-        )
-        endofauction.add_field(
-            name= 'The winner of the auction is',
-            value= f'<@{bids[-1][0]}> with {bids[-1][1]} nuggets!'
-        )
-        await ctx.send(embed = endofauction)
-    
 
+    async def EndingAuction():
+        while time.time() < EndingTime:
+            time.sleep(0.5)
+        if EndingTime < time.time():
+            with open('biddata.csv', 'r', newline='\n') as csvfile:
+                bids = list(csv.reader(csvfile, delimiter=','))
+            endofauction = discord.Embed(
+                title= "Auction Ended",    
+            )
+            endofauction.add_field(
+                name= "The winner of the auction is",
+                value= f'{bids[-1][0]} with {bids[-1][1]} nuggets!'
+            )
+            await ctx.send(embed = endofauction)
+    async def run_at(dt, EndAucCoro):
+        await asyncio.sleep(dt)
+        await asyncio.new_event_loop(EndAucCoro)
+        
 
+    loop = asyncio.get_event_loop()
+    loop.create_task(run_at(int(AuctionDuration), EndingAuction))
 
+    #async def entry():
+    #    asyncio.run(EndingAuction)
+    #thread = threading.Thread(target=entry)
+    #thread.start()
 
 @bot.command()
 async def auctioninfo(ctx):
@@ -172,8 +183,6 @@ async def bid(ctx, bidAmount):
     if EndingTime < int(time.time()):
         await ctx.send('There is currently no auction running. Please check with I8mydog or Boone for upcoming auctions.')
         return
-    if EndingTime <= int(time.time()) + 15:
-        EndingTime = int(time.time()) + 30
     if float(bidAmount) % 1 != 0:
         await ctx.send("Invalid Bid")
     bidtuple = (ctx.author.id, bidAmount)
@@ -181,9 +190,10 @@ async def bid(ctx, bidAmount):
     with open('biddata.csv', 'r', newline='\n') as csvfile:
         bids = list(csv.reader(csvfile, delimiter=','))
         if len(bids) != 0: 
-            lastbid = bids[-1][1]
-        
+            lastbid = bids[-1][1]    
     if int(lastbid) + 5 <= int(bidAmount):
+        if EndingTime <= int(time.time()) + 15:
+            EndingTime = int(time.time()) + 30
         with open('biddata.csv', 'a', newline="\n") as csvfile:
             bids = csv.writer(csvfile, delimiter=',')
             bids.writerow(bidtuple)
@@ -210,7 +220,7 @@ async def biddel(ctx):
         await ctx.send('Bid not found')
 
 @bot.command()
-async def lb(ctx):
+async def leaderboard(ctx):
     if EndingTime < time.time():
         await ctx.send('There is currently no auction running. Please check with I8mydog or Boone for upcoming auctions.')
     else:
@@ -262,7 +272,7 @@ async def check(ctx, thread1):
     print("ggg ez")
     logging.info("Thread %s: finishing", thread1)
     while time.time() < EndingTime:
-        time.sleep(int(0.5))
+        time.sleep(0.5)
         print("gg ez")
     if EndingTime < time.time():
         with open('biddata.csv', 'r', newline='\n') as csvfile:
@@ -276,10 +286,19 @@ async def check(ctx, thread1):
         )
     await ctx.send(embed = endofauction)
 """
-
-
-    
-
+"""
+    if EndingTime < time.time():
+        with open('biddata.csv', 'r', newline='\n') as csvfile:
+            bids = list(csv.reader(csvfile, delimiter=','))
+        endofauction = discord.Embed(
+            title= 'Auction Ended'
+        )
+        endofauction.add_field(
+            name= 'The winner of the auction is',
+            value= f'<@{bids[-1][0]}> with {bids[-1][1]} nuggets!'
+        )
+        await ctx.send(embed = endofauction) 
+"""
 
 
 
